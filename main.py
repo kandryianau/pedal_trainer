@@ -5,8 +5,9 @@ import time
 
 PLOT_WEIGH = 1600
 PLOT_HIGH = 600
-PLOT_TIME_IN_SEC = 14
-PLTO_X_STEP  = 2
+PLOT_TIME_IN_SEC = 13
+PLTO_X_STEP = 2
+TIME_SHIFT = -33
 
 pg.init()
 pg.joystick.init()
@@ -23,8 +24,9 @@ with open('breacking_curve.csv') as f:
 ideal_curve_points = []
 
 for line in lines:
-    x, y= line.replace('\n', '').split(';')
-    ideal_curve_points.append((int(float(x) * PLOT_WEIGH / PLOT_TIME_IN_SEC), int(PLOT_HIGH - PLOT_HIGH /100 * float(y))))
+    x, y = line.replace('\n', '').split(';')
+    ideal_curve_points.append((int((float(x) + TIME_SHIFT) * PLOT_WEIGH /
+                              PLOT_TIME_IN_SEC), int(PLOT_HIGH - PLOT_HIGH / 100 * float(y))))
 
 
 points = [(0, PLOT_HIGH)]
@@ -63,7 +65,8 @@ while True:
                 axis = joystick.get_axis(a)
                 plot_y = int((PLOT_HIGH * (1 - axis)) / 2)
 
-    if plot_x == 0: last_time = time.time()            
+    if plot_x == 0:
+        last_time = time.time()
 
     screen.fill("gray")
     plot_surface.fill((220, 230, 220))
@@ -74,13 +77,13 @@ while True:
             PLOT_WEIGH, PLOT_HIGH - int(PLOT_HIGH / 100 * i)))
 
     pg.draw.aalines(plot_surface, (0, 0, 0), False, ideal_curve_points, 1)
-    pygame.gfxdraw.bezier(plot_surface, ideal_curve_points, 2, (0, 255, 0))
     pg.draw.aalines(plot_surface, (255, 0, 0), False, points, 1)
-    pg.draw.line(plot_surface, (0, 0, 255), (plot_x, PLOT_HIGH), (plot_x, 0), 2)
+    pg.draw.line(plot_surface, (0, 0, 255),
+                 (plot_x, PLOT_HIGH), (plot_x, 0), 2)
     screen.blit(plot_surface, (10, 10))
     pg.display.update()
     plot_x += PLTO_X_STEP
-       
+
     if plot_x >= PLOT_WEIGH:
         current_time = time.time()
         print(current_time - last_time)
