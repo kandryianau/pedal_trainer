@@ -7,7 +7,7 @@ PLOT_WEIGH = 1600
 PLOT_HIGH = 600
 PLOT_TIME_IN_SEC = 13
 PLTO_X_STEP = 2
-TIME_SHIFT = -33
+TIME_SHIFT = 0
 
 pg.init()
 pg.joystick.init()
@@ -24,9 +24,9 @@ with open('breacking_curve.csv') as f:
 ideal_curve_points = []
 
 for line in lines:
-    x, y = line.replace('\n', '').split(';')
-    ideal_curve_points.append((int((float(x) + TIME_SHIFT) * PLOT_WEIGH /
-                              PLOT_TIME_IN_SEC), int(PLOT_HIGH - PLOT_HIGH / 100 * float(y))))
+    x, y = line.replace('\n', '').split(',')
+    ideal_curve_points.append(((float(x) + TIME_SHIFT) * PLOT_WEIGH /
+                              PLOT_TIME_IN_SEC, PLOT_HIGH - PLOT_HIGH / 100 * float(y)))
 
 
 points = [(0, PLOT_HIGH)]
@@ -76,10 +76,10 @@ while True:
         pg.draw.line(plot_surface, (150, 150, 150), (0, PLOT_HIGH - int(PLOT_HIGH / 100 * i)), (
             PLOT_WEIGH, PLOT_HIGH - int(PLOT_HIGH / 100 * i)))
 
-    pg.draw.aalines(plot_surface, (0, 0, 0), False, ideal_curve_points, 1)
-    pg.draw.aalines(plot_surface, (255, 0, 0), False, points, 1)
+    pg.draw.aalines(plot_surface, (0, 0, 0), True, ideal_curve_points, 10)
+    pg.draw.aalines(plot_surface, (255, 0, 0), False, points)
     pg.draw.line(plot_surface, (0, 0, 255),
-                 (plot_x, PLOT_HIGH), (plot_x, 0), 2)
+                 (plot_x, PLOT_HIGH), (plot_x, 0), 3)
     screen.blit(plot_surface, (10, 10))
     pg.display.update()
     plot_x += PLTO_X_STEP
